@@ -1,25 +1,35 @@
 import pygame
-pygame.init()
 
-WIDTH, HEIGHT = 1280, 720 # РАЗМЕР ОКНА
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
-
-pygame.display.set_caption("Visual Novel")  # НАЗВАНИЕ ИГРЫ
-
-font = pygame.font.SysFont("Arial", 36)  # ШРИФТ
+from src.settings import WIDTH, HEIGHT, FPS, TITLE
+from src.core.game import Game
 
 
-running = True # ИНДИКАТОР
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
+def main():
 
-    screen.fill((50,50,50)) # ФОН
+    pygame.init()
 
-    text_surface = font.render("Привет, это начало новой новеллы!", True, (255,255,255))
-    screen.blit(text_surface, (50,50))
+    screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
-    pygame.display.flip()
+    pygame.display.set_caption(TITLE)
 
-pygame.quit() # ЗАКРЫТИЕ ОКНА
+    clock = pygame.time.Clock()
+
+    game = Game(screen)
+
+    while game.running:
+
+        dt = clock.tick(FPS) / 1000
+
+        game.handle_events()
+
+        game.update(dt)
+
+        game.draw()
+
+        pygame.display.flip()
+
+    pygame.quit()
+
+
+if __name__ == "__main__":
+    main()
