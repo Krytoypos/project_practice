@@ -3,7 +3,7 @@ import pygame
 from settings import TILE_SIZE
 
 
-class Door(pygame.sprite.Sprite):
+class Fridge(pygame.sprite.Sprite):
 
     def __init__(self, pos):
 
