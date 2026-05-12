@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Журнал — NYCTO</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="site-title">NYCTO</div>
+        <nav>
+            <a href="index.html">[ ГЛАВНАЯ ]</a>
+            <a href="about.html">[ О ПРОЕКТЕ ]</a>
+            <a href="team.html">[ КОМАНДА ]</a>
+            <a href="journal.html" class="active">[ ЖУРНАЛ ]</a>
+            <a href="resources.html">[ РЕСУРСЫ ]</a>
+        </nav>
+    </header>
+
+    <main>
+        <h1>// ЖУРНАЛ РАЗРАБОТКИ //</h1>
+
+        <p style="text-align:center;">
+            Хроника прогресса, багов и побед команды Nycto.
+        </p>
+
+        <div class="divider">═══════════════════════════════════════════</div>
+
+        <!-- POST 1 -->
+        <article class="post">
+            <div class="post-meta">▸ DEV-LOG #001 — 24.02.2026</div>
+            <h2 class="post-title">🕯️ Идея, которая не отпускает</h2>
+            <p>
+                Всё началось с одного вопроса на созвоне:«А что если сделать игру, 
+                где <strong>темнота — это главный враг</strong>?»
+            </p>
+            <p>
+                Два часа обсуждений, три выброшенные концепции и один финальный питч: хоррор-платформер, 
+                ребёнок, заброшенный дом, единственный источник света в руках. Никаких скримеров — только темнота 
+                и то, что в ней <em>скрыто</em>.
+            </p>
+            <p>
+                Выбрали <code>Python</code> + <code>Pygame</code>. Ефим сразу предупредил: «Систему освещения придётся писать с нуля». 
+                Мы согласились. Назвали проект — <strong>Nycto</strong>.
+            </p>
+            <p>
+                <span class="tag">#pygame</span>
+                <span class="tag">#idea</span>
+                <span class="tag">#concept</span>
+            </p>
+        </article>
+
+        <!-- POST 2 -->
+        <article class="post">
+            <div class="post-meta">▸ DEV-LOG #002 — 02.03.2026</div>
+            <h2 class="post-title">🐙 Репозиторий открыт. Отсчёт пошёл.</h2>
+            <p>
+                Сегодня создали репозиторий на GitHub. Первый коммит — пустая папка
+                и <code>README.md</code> с одной строчкой: «Nycto — atmospheric horror
+                platformer built with Pygame».
+            </p>
+            <p>
+                Ефим настроил структуру папок: <code>assets</code>, <code>levels</code>,
+                <code>sounds</code>, <code>docs</code>, подключил виртуальное
+                окружение и зафиксировал зависимости в <code>requirements.txt</code>.
+                София добавила струткру в папку <code>sounds</code>.
+                Елена уже набрасывает первые эскизы персонажа в блокноте.
+            </p>
+            <p>
+                Репозиторий живёт. Проект начался официально.
+            </p>
+            <p>
+                <span class="tag">#github</span>
+                <span class="tag">#git</span>
+                <span class="tag">#setup</span>
+                <span class="tag">#teamwork</span>
+            </p>
+        </article>
+
+        <!-- POST 3 -->
+        <article class="post">
+            <div class="post-meta">▸ DEV-LOG #003 — 23.04.2026</div>
+            <h2 class="post-title">🎨 Персонаж обрёл лицо</h2>
+            <p>
+                Елена закончила базовый спрайтсет главного героя. Тайл
+                <code>32×32</code> — маленький, но выразительный. Анимации:
+                <strong>idle</strong> (2 кадра), <strong>ходьба</strong> (4 кадра),
+                <strong>прыжок</strong> (1 кадр). Итого 7 кадров — минимум,
+                который выглядит живым.
+            </p>
+            <p>
+                Особенно удалась анимация <em>idle</em>: персонаж чуть заметно
+                «дышит». В темноте это создаёт странное ощущение — герой живой,
+                но беззащитный.
+            </p>
+            <p>
+                Параллельно София собрала тайловую карту первого обучающего уровня
+                в текстовом файле. Сетка <code>40×22</code> тайла, три этажа,
+                всё на одном экране. Ефим уже загружает её через
+                <code>LevelManager</code>.
+            </p>
+            <p>
+                <span class="tag">#art</span>
+                <span class="tag">#sprites</span>
+                <span class="tag">#animation</span>
+                <span class="tag">#leveldesign</span>
+            </p>
+        </article>
+
+        <!-- POST 4 -->
+        <article class="post">
+            <div class="post-meta">▸ DEV-LOG #004 — 23.04.2026</div>
+            <h2 class="post-title">🔊 Звук — это половина страха</h2>
+            <p>
+                Пока шла работа над графикой, София занималась звуком.
+                Задача казалась простой — нашлась сложной.
+            </p>
+            <p>
+                Freesound, два дня отбора, 40+ прослушанных паков. Финальный набор:
+                <strong>3 варианта шагов</strong> по дереву (воспроизводятся случайно
+                через <code>random.choice</code>), механический щелчок фонарика,
+                электрический гул лампы на <code>loop</code>, скрип двери и —
+                главная находка — <em>далёкий вздох где-то в темноте</em>.
+            </p>
+            <p>
+                Последний звук решили запускать случайно, каждые
+                <strong>20–40 секунд</strong>. На тестировании все трое вздрогнули.
+                Значит, работает.
+            </p>
+            <p>
+                <span class="tag">#sound</span>
+                <span class="tag">#audio</span>
+                <span class="tag">#pygame</span>
+                <span class="tag">#mixer</span>
+            </p>
+        </article>
+
+        <!-- POST 5 -->
+        <article class="post">
+            <div class="post-meta">▸ DEV-LOG #005 — 01.05.2026</div>
+            <h2 class="post-title">⚙️ Физика победила. Свет зажёгся.</h2>
+            <p>
+                Ефим закрыл две главные задачи спринта.
+            </p>
+            <p>
+                Первая — <strong>кастомный физический движок</strong>. Коллизии
+                обрабатываются раздельно по осям <code>X</code> и <code>Y</code>:
+                сначала горизонталь, потом вертикаль. Персонаж больше не
+                «застревает» в углах платформ. <code>Delta Time</code> подключён —
+                скорость не зависит от <em>fps</em>.
+            </p>
+            <p>
+                Вторая — <strong>система освещения «Тёмная вуаль»</strong>. Чёрный
+                <code>Surface</code> накладывается поверх всего экрана. В нём
+                «вырезается» круг вокруг игрока через <code>BLEND_RGBA_MULT</code>.
+                Свет мягкий, радиус — <strong>180px</strong>. На третьем уровне
+                он будет медленно уменьшаться.
+            </p>
+            <p>
+                София откалибровала радиус света вручную: слишком большой —
+                пропадает страх, слишком маленький — игрок злится. Оптимум
+                нашли после ~20 итераций.
+            </p>
+            <p>
+                Елена закончила спрайты всех интерактивных объектов:
+                <strong>кнопки</strong> (2 состояния), <strong>дверь</strong>
+                (открытая/закрытая), <strong>выключатель</strong>,
+                <strong>лего</strong>, <strong>стекло</strong>.
+            </p>
+            <p>
+                Nycto начинает выглядеть как игра.
+            </p>
+            <p>
+                <span class="tag">#physics</span>
+                <span class="tag">#lighting</span>
+                <span class="tag">#milestone</span>
+                <span class="tag">#nycto</span>
+            </p>
+        </article>
+    </main>
+
+    <footer>
+        <span class="skull">▣ ▣ ▣</span>
+        © 2026 NYCTO TEAM • SHHH... DON'T TURN OFF THE LIGHT
+    </footer>
+</body>
+</html>
