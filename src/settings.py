@@ -2,7 +2,7 @@ WIDTH = 1280
 HEIGHT = 720
 FPS = 60
 
-TITLE = "Horror Platformer"
+TITLE = "Nycto"
 TILE_SIZE = 32
 
 BLACK = (0, 0, 0)

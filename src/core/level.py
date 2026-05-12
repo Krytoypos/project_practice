@@ -8,7 +8,8 @@ from settings import (
 )
 
 from sprites.player import Player
-from sprites.platform import Platform
+from sprites.platform_1 import Platform_1
+from sprites.platform_2 import Platform_2
 from sprites.button import Button
 from sprites.nightstand import Nightstand
 from sprites.lego import Lego
@@ -20,20 +21,17 @@ from sprites.bed import Bed
 from sprites.sofa import Sofa
 from sprites.table import Table
 from sprites.fridge import Fridge
+from sprites.floor import Floor_1
+from sprites.candle import Candle
 
 class Level:
 
-    def __init__(self, level_path):
+    def __init__(self, level_path, sound_manager):
 
         self.level_path = level_path
-
-        # Группы спрайтов
+        self.sound_manager = sound_manager
         self.visible_sprites = pygame.sprite.Group()
         self.obstacle_sprites = pygame.sprite.Group()
-
-        # =========================
-        # ОСВЕЩЕНИЕ
-        # =========================
 
         # Поверхность темноты
         self.fog = pygame.Surface(
@@ -42,38 +40,57 @@ class Level:
         )
 
         # Маска света
-        self.light_mask = pygame.image.load("../assets/sprites/light_mask.jpg").convert_alpha()
+        self.light_mask = pygame.image.load("../assets/sprites/light_mask.png").convert_alpha()
+        self.candle_light_mask = pygame.transform.scale(
+            self.light_mask,
+            (140, 140)
+        )
 
-        # =========================
+        self.player_light_mask = pygame.transform.scale(
+            self.light_mask,
+            (200, 200)
+        )
+
+        level_width = 40 * TILE_SIZE
+        level_height = 23 * TILE_SIZE
+
+        self.background = pygame.image.load(
+            "../assets/sprites/background.png"
+        ).convert()
+
+        self.background = pygame.transform.scale(
+            self.background,
+            (level_width, level_height)
+        )
+
         # КАРТА УРОВНЯ
-        # =========================
-
         self.level_map = [
             "########################################",
             "#...................#..................#",
-            "#..............K....D................E.#",
-            "#...................D..................#",
-            "#.....\#################################",
+            "#..............K.......................#",
+            "#...................D................C.#",
+            "#..../##################################",
             "#HH....#################################",
             "#......#################################",
-            "#....HH#################################",
-            "#......................#################",
+            "#....hh#################################",
+            "#.....................##################",
             "#HH....................#################",
-            "#......................\################",
+            "#.......................################",
             "#################......................#",
             "#################......................#",
-            "#################VVV...................#",
-            "#################VVV...................#",
+            "#################......................#",
+            "#################V.....................#",
             "###################################\...#",
-            "##############################/........#",
-            "##########################/............#",
+            "##############################.........#",
+            "##########################.............#",
             "#.................................../###",
-            "#.BBB...............................####",
-            "#.BBB.P.............................####",
+            "#...................................####",
+            "#.B.....P...........................####",
             "########################################",
-            "######################################"
+            "########################################"
         ]
 
+        self.light_sprites = pygame.sprite.Group()
         self.hazard_sprites = pygame.sprite.Group()
         # Создание карты
         self.create_map()
@@ -93,7 +110,10 @@ class Level:
 
                 if cell == "P":
 
-                    self.player = Player((x, y))
+                    self.player = Player(
+                        (x, y),
+                        self.sound_manager
+                    )
 
                     self.visible_sprites.add(self.player)
 
@@ -101,9 +121,16 @@ class Level:
                 # ПЛАТФОРМЫ
                 # =====================================
 
+                elif cell == "C":
+
+                    candle = Candle((x, y - 32))
+
+                    self.visible_sprites.add(candle)
+                    self.light_sprites.add(candle)
+
                 elif cell == "#":
 
-                    platform = Platform((x, y))
+                    platform = Floor_1((x, y))
 
                     self.visible_sprites.add(platform)
                     self.obstacle_sprites.add(platform)
@@ -114,7 +141,18 @@ class Level:
 
                 elif cell == "H":
 
-                    shelf = Platform((x, y))
+                    shelf = Platform_1((x, y))
+
+                    # Сквозная платформа
+                    shelf.is_passable = True
+
+                    self.visible_sprites.add(shelf)
+                    self.obstacle_sprites.add(shelf)
+
+
+                elif cell == "h":
+
+                    shelf = Platform_2((x, y))
 
                     # Сквозная платформа
                     shelf.is_passable = True
@@ -243,47 +281,43 @@ class Level:
 
     def update(self, dt):
 
-        # Обновление всех спрайтов
-        self.visible_sprites.update(
-            dt,
-            self.obstacle_sprites
-        )
+        for sprite in self.visible_sprites:
+
+            if sprite == self.player:
+                sprite.update(dt, self.obstacle_sprites)
+
+            else:
+                sprite.update()
 
     def draw(self, screen):
-
-        # =========================
-        # ФОН
-        # =========================
-
         screen.fill(BLACK)
-
-        # =========================
-        # СПРАЙТЫ
-        # =========================
-
         self.visible_sprites.draw(screen)
-
-        # =========================
-        # ОСВЕЩЕНИЕ
-        # =========================
-
         # Полная темнота
-        self.fog.fill((0, 0, 0, 235))
+        self.fog.fill((0, 0, 0, 255))
+
+        for candle in self.light_sprites:
+            light_x = (candle.rect.centerx - self.candle_light_mask.get_width() // 2)
+            light_y = (candle.rect.centery- self.candle_light_mask.get_height() // 2)
+            self.fog.blit(
+                self.candle_light_mask,
+                (light_x, light_y),
+                special_flags=pygame.BLEND_RGBA_SUB
+            )
 
         # Позиция света
         light_x = (
             self.player.rect.centerx
-            - self.light_mask.get_width() // 2
+            - self.player_light_mask.get_width() // 2
         )
 
         light_y = (
             self.player.rect.centery
-            - self.light_mask.get_height() // 2
+            - self.player_light_mask.get_height() // 2
         )
 
         # Вырезаем свет
         self.fog.blit(
-            self.light_mask,
+            self.player_light_mask,
             (light_x, light_y),
             special_flags=pygame.BLEND_RGBA_SUB
         )

@@ -1,5 +1,6 @@
 import pygame
 
+import settings
 from settings import (
     PLAYER_SPEED,
     GRAVITY,
@@ -8,54 +9,96 @@ from settings import (
 
 
 class Player(pygame.sprite.Sprite):
-
     def __init__(self, pos):
-
         super().__init__()
 
-        # Временный спрайт
-        self.image = pygame.Surface((32, 64))
-        self.image.fill((200, 200, 220))
+        self.animations = {
+            "idle": [],
+            "run": [],
+            "jump": []
+        }
 
+        self.load_animations()
+        self.state = "idle"
+        self.frame_index = 0
+        self.animation_speed = 5
+        self.facing_right = True
+
+        # Текущий спрайт
+        self.image = self.animations[self.state][self.frame_index]
         self.rect = self.image.get_rect(topleft=pos)
 
-        # Хитбокс
         self.hitbox = pygame.Rect(
-            self.rect.x + 4,
-            self.rect.y + 2,
-            24,
-            60
+            self.rect.x + 10,
+            self.rect.y + 4,
+            settings.PLAYER_WIDTH,
+            settings.PLAYER_HEIGHT
         )
 
-        # Float-позиция
+        # позиция
         self.pos = pygame.Vector2(self.hitbox.topleft)
 
-        # Скорость
+        # ФИЗИКА
         self.velocity = pygame.Vector2(0, 0)
-
-        # На земле?
         self.on_ground = False
 
+    def load_animations(self):
+        idle_1 = pygame.image.load(
+            "../assets/sprites/player/idle1.png"
+        ).convert_alpha()
+
+        idle_2 = pygame.image.load(
+            "../assets/sprites/player/idle2.png"
+        ).convert_alpha()
+        self.animations["idle"] = [
+            idle_1,
+            idle_2
+        ]
+
+        run_1 = pygame.image.load(
+            "../assets/sprites/player/run1.png"
+        ).convert_alpha()
+
+        run_2 = pygame.image.load(
+            "../assets/sprites/player/run2.png"
+        ).convert_alpha()
+
+        run_3 = pygame.image.load(
+            "../assets/sprites/player/run3.png"
+        ).convert_alpha()
+        self.animations["run"] = [
+            run_2,
+            run_1,
+            run_2,
+            run_3
+        ]
+
+        jump_1 = pygame.image.load(
+            "../assets/sprites/player/jump1.png"
+        ).convert_alpha()
+
+        jump_2 = pygame.image.load(
+            "../assets/sprites/player/jump2.png"
+        ).convert_alpha()
+        self.animations["jump"] = [
+            jump_1,
+            jump_2
+        ]
+
     def get_input(self):
-
         keys = pygame.key.get_pressed()
-
-        # Движение по X
         self.velocity.x = 0
-
         if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
             self.velocity.x = PLAYER_SPEED
-
+            self.facing_right = True
         if keys[pygame.K_LEFT] or keys[pygame.K_a]:
             self.velocity.x = -PLAYER_SPEED
-
-        # Прыжок
+            self.facing_right = False
         if (
             keys[pygame.K_SPACE]
             or keys[pygame.K_UP]
             or keys[pygame.K_w]
         ) and self.on_ground:
-
             self.jump()
 
     def jump(self):
@@ -67,79 +110,77 @@ class Player(pygame.sprite.Sprite):
 
         self.velocity.y += GRAVITY * dt
 
-        # Ограничение скорости падения
         if self.velocity.y > 1200:
             self.velocity.y = 1200
 
-    def horizontal_movement_collision(self, platforms, dt):
+    def animate(self, dt):
+        if self.velocity.y < -50:
+            self.state = "jump"
+        elif self.velocity.x != 0:
+            self.state = "run"
+        else:
+            self.state = "idle"
 
-        # Движение по X
+        self.frame_index += self.animation_speed * dt
+        animation = self.animations[self.state]
+
+        if self.frame_index >= len(animation):
+            self.frame_index = 0
+
+        self.image = animation[int(self.frame_index)]
+
+        # ОТРАЖЕНИЕ
+        if not self.facing_right:
+            self.image = pygame.transform.flip(
+                self.image,
+                True,
+                False
+            )
+
+    def horizontal_movement_collision(self, platforms, dt):
         self.pos.x += self.velocity.x * dt
         self.hitbox.x = round(self.pos.x)
-
-        # Коллизии
         for sprite in platforms:
-
             if sprite.rect.colliderect(self.hitbox):
-
-                # Движение вправо
                 if self.velocity.x > 0:
                     self.hitbox.right = sprite.rect.left
-
-                # Движение влево
                 elif self.velocity.x < 0:
                     self.hitbox.left = sprite.rect.right
-
-                # Синхронизация позиции
                 self.pos.x = self.hitbox.x
-
-                # Остановка
                 self.velocity.x = 0
 
     def vertical_movement_collision(self, platforms, dt):
 
-        # Гравитация
         self.apply_gravity(dt)
-
-        # Сбрасываем состояние пола
         self.on_ground = False
-
-        # Движение по Y
         self.pos.y += self.velocity.y * dt
         self.hitbox.y = round(self.pos.y)
 
-        # Коллизии
         for sprite in platforms:
-
             if sprite.rect.colliderect(self.hitbox):
-
-                # Падение вниз
                 if self.velocity.y > 0:
-
                     self.hitbox.bottom = sprite.rect.top
                     self.on_ground = True
-
-                # Удар головой
                 elif self.velocity.y < 0:
-
                     self.hitbox.top = sprite.rect.bottom
-
-                # Синхронизация позиции
                 self.pos.y = self.hitbox.y
-
-                # Остановка
                 self.velocity.y = 0
 
     def update(self, dt, platforms):
 
-        # Ввод
         self.get_input()
 
-        # Коллизии по X
-        self.horizontal_movement_collision(platforms, dt)
+        self.horizontal_movement_collision(
+            platforms,
+            dt
+        )
 
-        # Коллизии по Y
-        self.vertical_movement_collision(platforms, dt)
+        self.vertical_movement_collision(
+            platforms,
+            dt
+        )
 
-        # Синхронизация визуального rect
+        self.animate(dt)
+
+        # Синхронизация rect
         self.rect.center = self.hitbox.center
