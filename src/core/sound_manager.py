@@ -53,7 +53,7 @@ class SoundManager:
             )
         ]
 
-        self.sounds["jump"].set_volume(0.4)
+        self.sounds["jump"].set_volume(0.6)
 
         for step in self.footsteps:
             step.set_volume(1)
@@ -75,6 +75,6 @@ class SoundManager:
             "../assets/music/Background-music/Background-music.ogg"
         )
 
-        pygame.mixer.music.set_volume(0.03)
+        pygame.mixer.music.set_volume(0.2)
 
         pygame.mixer.music.play(-1)

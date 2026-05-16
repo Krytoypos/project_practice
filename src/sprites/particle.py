@@ -13,3 +13,4 @@ class Particle(pygame.sprite.Sprite):
         self.image.fill((255, 0, 255))
 
         self.rect = self.image.get_rect(topleft=pos)
+        self.hitbox = self.rect.copy()

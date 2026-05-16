@@ -24,23 +24,33 @@ from sprites.fridge import Fridge
 from sprites.floor import Floor_1
 from sprites.candle import Candle
 
+
 class Level:
 
-    def __init__(self, level_path, sound_manager):
+    def __init__(self, levels_list, sound_manager):
 
-        self.level_path = level_path
         self.sound_manager = sound_manager
+
+        self.levels_list = levels_list
+        self.current_level_index = 0
+
         self.visible_sprites = pygame.sprite.Group()
         self.obstacle_sprites = pygame.sprite.Group()
+        self.light_sprites = pygame.sprite.Group()
+        self.hazard_sprites = pygame.sprite.Group()
+        self.door_sprites = pygame.sprite.Group()
 
-        # Поверхность темноты
+        self.level_completed = False
+
         self.fog = pygame.Surface(
             (WIDTH, HEIGHT),
             pygame.SRCALPHA
         )
 
-        # Маска света
-        self.light_mask = pygame.image.load("../assets/sprites/light_mask.png").convert_alpha()
+        self.light_mask = pygame.image.load(
+            "../assets/sprites/light_mask.png"
+        ).convert_alpha()
+
         self.candle_light_mask = pygame.transform.scale(
             self.light_mask,
             (140, 140)
@@ -63,37 +73,47 @@ class Level:
             (level_width, level_height)
         )
 
-        # КАРТА УРОВНЯ
-        self.level_map = [
-            "########################################",
-            "#...................#..................#",
-            "#..............K.......................#",
-            "#...................D................C.#",
-            "#..../##################################",
-            "#HH....#################################",
-            "#......#################################",
-            "#....hh#################################",
-            "#.....................##################",
-            "#HH....................#################",
-            "#.......................################",
-            "#################......................#",
-            "#################......................#",
-            "#################......................#",
-            "#################V.....................#",
-            "###################################\...#",
-            "##############################.........#",
-            "##########################.............#",
-            "#.................................../###",
-            "#...................................####",
-            "#.B.....P...........................####",
-            "########################################",
-            "########################################"
-        ]
+        self.load_level_data(
+            self.levels_list[self.current_level_index]
+        )
 
-        self.light_sprites = pygame.sprite.Group()
-        self.hazard_sprites = pygame.sprite.Group()
-        # Создание карты
+    def clear_level(self):
+
+        self.visible_sprites.empty()
+        self.obstacle_sprites.empty()
+        self.light_sprites.empty()
+        self.hazard_sprites.empty()
+        self.door_sprites.empty()
+
+    def load_level_data(self, filepath):
+
+        self.clear_level()
+
+        self.level_completed = False
+
+        self.level_map = []
+
+        with open(filepath, "r", encoding="utf-8") as file:
+
+            for line in file:
+                self.level_map.append(
+                    line.strip("\r\n")
+                )
+
         self.create_map()
+
+    def load_next_level(self):
+
+        self.current_level_index += 1
+
+        if self.current_level_index >= len(self.levels_list):
+            return False
+
+        self.load_level_data(
+            self.levels_list[self.current_level_index]
+        )
+
+        return True
 
     def create_map(self):
 
@@ -104,10 +124,6 @@ class Level:
                 x = col_index * TILE_SIZE
                 y = row_index * TILE_SIZE
 
-                # =====================================
-                # ИГРОК
-                # =====================================
-
                 if cell == "P":
 
                     self.player = Player(
@@ -115,11 +131,9 @@ class Level:
                         self.sound_manager
                     )
 
-                    self.visible_sprites.add(self.player)
-
-                # =====================================
-                # ПЛАТФОРМЫ
-                # =====================================
+                    self.visible_sprites.add(
+                        self.player
+                    )
 
                 elif cell == "C":
 
@@ -135,44 +149,29 @@ class Level:
                     self.visible_sprites.add(platform)
                     self.obstacle_sprites.add(platform)
 
-                # =====================================
-                # СКВОЗНАЯ ПОЛКА
-                # =====================================
-
                 elif cell == "H":
 
                     shelf = Platform_1((x, y))
 
-                    # Сквозная платформа
                     shelf.is_passable = True
 
                     self.visible_sprites.add(shelf)
                     self.obstacle_sprites.add(shelf)
-
 
                 elif cell == "h":
 
                     shelf = Platform_2((x, y))
 
-                    # Сквозная платформа
                     shelf.is_passable = True
 
                     self.visible_sprites.add(shelf)
                     self.obstacle_sprites.add(shelf)
-
-                # =====================================
-                # КНОПКА
-                # =====================================
 
                 elif cell == "K":
 
                     button = Button((x, y))
 
                     self.visible_sprites.add(button)
-
-                # =====================================
-                # ТУМБОЧКА
-                # =====================================
 
                 elif cell == "N":
 
@@ -181,20 +180,12 @@ class Level:
                     self.visible_sprites.add(nightstand)
                     self.obstacle_sprites.add(nightstand)
 
-                # =====================================
-                # LEGO (ОПАСНОСТЬ)
-                # =====================================
-
                 elif cell == "L":
 
                     lego = Lego((x, y))
 
                     self.visible_sprites.add(lego)
                     self.hazard_sprites.add(lego)
-
-                # =====================================
-                # СТЕКЛО (ОПАСНОСТЬ)
-                # =====================================
 
                 elif cell == "S":
 
@@ -203,20 +194,12 @@ class Level:
                     self.visible_sprites.add(glass)
                     self.hazard_sprites.add(glass)
 
-                # =====================================
-                # НАКЛОН ВЛЕВО
-                # =====================================
-
                 elif cell == "/":
 
                     slope_left = SlopeLeft((x, y))
 
                     self.visible_sprites.add(slope_left)
                     self.obstacle_sprites.add(slope_left)
-
-                # =====================================
-                # НАКЛОН ВПРАВО
-                # =====================================
 
                 elif cell == "\\":
 
@@ -225,19 +208,12 @@ class Level:
                     self.visible_sprites.add(slope_right)
                     self.obstacle_sprites.add(slope_right)
 
-                # =====================================
-                # ДВЕРЬ (1x2)
-                # =====================================
-
                 elif cell == "D":
 
                     door = Door((x, y - TILE_SIZE))
 
                     self.visible_sprites.add(door)
-
-                # =====================================
-                # КРОВАТЬ (3x2)
-                # =====================================
+                    self.door_sprites.add(door)
 
                 elif cell == "B":
 
@@ -246,20 +222,12 @@ class Level:
                     self.visible_sprites.add(bed)
                     self.obstacle_sprites.add(bed)
 
-                # =====================================
-                # ДИВАН (3x2)
-                # =====================================
-
                 elif cell == "V":
 
                     sofa = Sofa((x, y - TILE_SIZE))
 
                     self.visible_sprites.add(sofa)
                     self.obstacle_sprites.add(sofa)
-
-                # =====================================
-                # СТОЛ (2x1)
-                # =====================================
 
                 elif cell == "T":
 
@@ -268,10 +236,6 @@ class Level:
                     self.visible_sprites.add(table)
                     self.obstacle_sprites.add(table)
 
-                # =====================================
-                # ХОЛОДИЛЬНИК (1x2)
-                # =====================================
-
                 elif cell == "R":
 
                     fridge = Fridge((x, y - TILE_SIZE))
@@ -279,32 +243,61 @@ class Level:
                     self.visible_sprites.add(fridge)
                     self.obstacle_sprites.add(fridge)
 
+    def check_level_complete(self):
+
+        for door in self.door_sprites:
+
+            if self.player.hitbox.colliderect(door.rect):
+
+                self.sound_manager.play("door")
+
+                self.level_completed = True
+
+                return
+
     def update(self, dt):
 
         for sprite in self.visible_sprites:
 
             if sprite == self.player:
-                sprite.update(dt, self.obstacle_sprites)
+                sprite.update(
+                    dt,
+                    self.obstacle_sprites
+                )
 
             else:
                 sprite.update()
 
+        self.check_level_complete()
+
     def draw(self, screen):
+
         screen.fill(BLACK)
+
+        screen.blit(self.background, (0, 0))
+
         self.visible_sprites.draw(screen)
-        # Полная темнота
+
         self.fog.fill((0, 0, 0, 255))
 
         for candle in self.light_sprites:
-            light_x = (candle.rect.centerx - self.candle_light_mask.get_width() // 2)
-            light_y = (candle.rect.centery- self.candle_light_mask.get_height() // 2)
+
+            light_x = (
+                candle.rect.centerx
+                - self.candle_light_mask.get_width() // 2
+            )
+
+            light_y = (
+                candle.rect.centery
+                - self.candle_light_mask.get_height() // 2
+            )
+
             self.fog.blit(
                 self.candle_light_mask,
                 (light_x, light_y),
                 special_flags=pygame.BLEND_RGBA_SUB
             )
 
-        # Позиция света
         light_x = (
             self.player.rect.centerx
             - self.player_light_mask.get_width() // 2
@@ -315,12 +308,10 @@ class Level:
             - self.player_light_mask.get_height() // 2
         )
 
-        # Вырезаем свет
         self.fog.blit(
             self.player_light_mask,
             (light_x, light_y),
             special_flags=pygame.BLEND_RGBA_SUB
         )
 
-        # Накладываем темноту
         screen.blit(self.fog, (0, 0))

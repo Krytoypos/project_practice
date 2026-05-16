@@ -9,7 +9,7 @@ from settings import (
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, pos):
+    def __init__(self, pos, sound_manager):
         super().__init__()
 
         self.animations = {
@@ -18,10 +18,12 @@ class Player(pygame.sprite.Sprite):
             "jump": []
         }
 
+        self.sound_manager = sound_manager
+
         self.load_animations()
         self.state = "idle"
         self.frame_index = 0
-        self.animation_speed = 5
+        self.animation_speed = 6
         self.facing_right = True
 
         # Текущий спрайт
@@ -41,6 +43,8 @@ class Player(pygame.sprite.Sprite):
         # ФИЗИКА
         self.velocity = pygame.Vector2(0, 0)
         self.on_ground = False
+
+        self.step_timer = 0
 
     def load_animations(self):
         idle_1 = pygame.image.load(
@@ -102,7 +106,7 @@ class Player(pygame.sprite.Sprite):
             self.jump()
 
     def jump(self):
-
+        self.sound_manager.play("jump")
         self.velocity.y = JUMP_POWER
         self.on_ground = False
 
@@ -166,21 +170,34 @@ class Player(pygame.sprite.Sprite):
                 self.pos.y = self.hitbox.y
                 self.velocity.y = 0
 
-    def update(self, dt, platforms):
+    def update(self, dt, platforms=None):
 
         self.get_input()
 
-        self.horizontal_movement_collision(
-            platforms,
-            dt
-        )
+        if platforms:
+            self.horizontal_movement_collision(
+                platforms,
+                dt
+            )
 
-        self.vertical_movement_collision(
-            platforms,
-            dt
-        )
+            self.vertical_movement_collision(
+                platforms,
+                dt
+            )
+
+        if abs(self.velocity.x) > 20 and self.on_ground:
+
+            self.step_timer += dt
+
+            if self.step_timer >= 0.12:
+                self.step_timer = 0
+
+                self.sound_manager.play_footstep()
+
+        else:
+
+            self.step_timer = 0
 
         self.animate(dt)
 
-        # Синхронизация rect
         self.rect.center = self.hitbox.center

@@ -1,16 +1,13 @@
 import pygame
 
-from settings import TILE_SIZE
 
-
-class SlopeLeft(pygame.sprite.Sprite):
+class Platform_2(pygame.sprite.Sprite):
 
     def __init__(self, pos):
-
         super().__init__()
 
         self.image = pygame.image.load(
-            "../assets/sprites/block6.png"
+            "../assets/sprites/platform2.png"
         ).convert_alpha()
 
         self.rect = self.image.get_rect(topleft=pos)

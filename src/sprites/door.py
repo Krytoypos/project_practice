@@ -9,7 +9,10 @@ class Door(pygame.sprite.Sprite):
 
         super().__init__()
 
-        self.image = pygame.Surface((TILE_SIZE, TILE_SIZE * 2))
-        self.image.fill((120, 80, 80))
+        self.image = pygame.image.load(
+            "../assets/sprites/door2.png"
+        ).convert_alpha()
 
         self.rect = self.image.get_rect(topleft=pos)
+        self.hitbox = self.rect.copy()
+

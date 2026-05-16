@@ -13,3 +13,4 @@ class Nightstand(pygame.sprite.Sprite):
         self.image.fill((200, 50, 50))
 
         self.rect = self.image.get_rect(topleft=pos)
+        self.hitbox = self.rect.copy()

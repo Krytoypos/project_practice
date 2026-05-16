@@ -1,7 +1,7 @@
 import pygame
 
-from src.settings import WIDTH, HEIGHT, FPS, TITLE
-from src.core.game import Game
+from settings import WIDTH, HEIGHT, FPS, TITLE
+from core.game import Game
 
 
 def main():
