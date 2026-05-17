@@ -3,13 +3,14 @@ import pygame
 from settings import TILE_SIZE
 
 
-class Lego(pygame.sprite.Sprite):
+class Right_Top(pygame.sprite.Sprite):
 
     def __init__(self, pos):
+
         super().__init__()
 
         self.image = pygame.image.load(
-            "../assets/sprites/lego.png"
+            "../assets/sprites/floor22.png"
         ).convert_alpha()
 
         self.rect = self.image.get_rect(topleft=pos)

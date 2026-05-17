@@ -6,11 +6,11 @@ from settings import TILE_SIZE
 class Glass(pygame.sprite.Sprite):
 
     def __init__(self, pos):
-
         super().__init__()
 
-        self.image = pygame.Surface((TILE_SIZE * 3, TILE_SIZE))
-        self.image.fill((120, 80, 80))
+        self.image = pygame.image.load(
+            "../assets/sprites/glass.png"
+        ).convert_alpha()
 
         self.rect = self.image.get_rect(topleft=pos)
         self.hitbox = self.rect.copy()

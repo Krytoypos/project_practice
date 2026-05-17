@@ -6,11 +6,14 @@ from settings import TILE_SIZE
 class Fridge(pygame.sprite.Sprite):
 
     def __init__(self, pos):
-
         super().__init__()
 
-        self.image = pygame.Surface((TILE_SIZE, TILE_SIZE * 2))
-        self.image.fill((120, 80, 80))
+        self.image = pygame.image.load(
+            "../assets/sprites/platform1.png"
+        ).convert_alpha()
 
-        self.rect = self.image.get_rect(topleft=pos)
+        self.rect = self.image.get_rect(
+            topleft=pos
+        )
+
         self.hitbox = self.rect.copy()

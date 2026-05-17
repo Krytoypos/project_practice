@@ -14,8 +14,10 @@ from sprites.button import Button
 from sprites.nightstand import Nightstand
 from sprites.lego import Lego
 from sprites.glass import Glass
-from sprites.slope_left import SlopeLeft
-from sprites.slope_right import SlopeRight
+from sprites.right_bottom import Right_Bottom
+from sprites.right_top import Right_Top
+from sprites.left_bottom import Left_Bottom
+from sprites.left_top import Left_Top
 from sprites.door import Door
 from sprites.bed import Bed
 from sprites.sofa import Sofa
@@ -196,17 +198,31 @@ class Level:
 
                 elif cell == "/":
 
-                    slope_left = SlopeLeft((x, y))
+                    right_bottom = Right_Bottom((x, y))
 
-                    self.visible_sprites.add(slope_left)
-                    self.obstacle_sprites.add(slope_left)
+                    self.visible_sprites.add(right_bottom)
+                    self.obstacle_sprites.add(right_bottom)
 
                 elif cell == "\\":
 
-                    slope_right = SlopeRight((x, y))
+                    left_bottom = Left_Bottom((x, y))
 
-                    self.visible_sprites.add(slope_right)
-                    self.obstacle_sprites.add(slope_right)
+                    self.visible_sprites.add(left_bottom)
+                    self.obstacle_sprites.add(left_bottom)
+
+                elif cell == "}":
+
+                    right_top = Right_Top((x, y))
+
+                    self.visible_sprites.add(right_top)
+                    self.obstacle_sprites.add(right_top)
+
+                elif cell == "%":
+
+                    left_top = Left_Top((x, y))
+
+                    self.visible_sprites.add(left_top)
+                    self.obstacle_sprites.add(left_top)
 
                 elif cell == "D":
 
@@ -238,7 +254,7 @@ class Level:
 
                 elif cell == "R":
 
-                    fridge = Fridge((x, y - TILE_SIZE))
+                    fridge = Fridge((x, y))
 
                     self.visible_sprites.add(fridge)
                     self.obstacle_sprites.add(fridge)
